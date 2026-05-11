@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "362282762265",
+    "project_id": "appventasagua",
+    "storage_bucket": "appventasagua.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362282762265:android:60ff1a7a1dd01c84ca6a88",
+        "android_client_info": {
+          "package_name": "app.ventas.agua"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOZShIBYHMBZOBpUnRFXaDvvAIBgVpQYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
