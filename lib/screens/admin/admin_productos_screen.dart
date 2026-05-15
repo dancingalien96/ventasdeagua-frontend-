@@ -124,6 +124,7 @@ class _AdminProductosScreenState extends State<AdminProductosScreen> {
                   ),
                 ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _mostrarFormProducto(),
         child: const Icon(Icons.add),
       ),

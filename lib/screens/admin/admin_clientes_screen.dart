@@ -414,6 +414,7 @@ class _AdminClientesScreenState extends State<AdminClientesScreen>
       // FAB solo en tab Clientes
       floatingActionButton: _tab.index == 0
           ? FloatingActionButton(
+              heroTag: null,
               onPressed: () => _mostrarFormCliente(),
               child: const Icon(Icons.add),
             )

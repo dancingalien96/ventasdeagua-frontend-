@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/cierre_dia.dart';
+import '../../models/cliente.dart';
 import '../../models/venta.dart';
 import '../../services/api_service.dart';
 import 'admin_historial_cierres_screen.dart';
@@ -16,6 +17,7 @@ class AdminResumenScreen extends StatefulWidget {
 class _AdminResumenScreenState extends State<AdminResumenScreen> {
   List<Venta> _ventas = [];
   List<CierreDia> _cierresHoy = [];
+  List<Cliente> _clientesConDeuda = [];
   bool _cargando = true;
 
   @override
@@ -30,6 +32,7 @@ class _AdminResumenScreenState extends State<AdminResumenScreen> {
     try {
       final ventasData = await ApiService.get('/ventas');
       final cierresData = await ApiService.get('/cierres');
+      final clientesData = await ApiService.get('/clientes');
       if (!mounted) return;
       final hoy = DateTime.now().toIso8601String().split('T')[0];
       setState(() {
@@ -38,6 +41,11 @@ class _AdminResumenScreenState extends State<AdminResumenScreen> {
             .map((c) => CierreDia.fromJson(c))
             .where((c) => c.fecha == hoy)
             .toList();
+        _clientesConDeuda = (clientesData as List)
+            .map((c) => Cliente.fromJson(c))
+            .where((c) => c.tieneDeuda)
+            .toList()
+          ..sort((a, b) => b.deudaTotal.compareTo(a.deudaTotal));
       });
     } catch (_) {} finally {
       if (mounted) setState(() => _cargando = false);
@@ -134,6 +142,7 @@ class _AdminResumenScreenState extends State<AdminResumenScreen> {
     final totalGeneral = _ventas.fold<double>(0, (s, v) => s + v.total);
     final pendientes = _cierresHoy.where((c) => c.pendiente).length;
     final sinCierre = _cierresHoy.isEmpty && ventasHoy.isNotEmpty;
+    final totalDeuda = _clientesConDeuda.fold<double>(0, (s, c) => s + c.deudaTotal);
 
     return RefreshIndicator(
       onRefresh: _cargar,
@@ -171,11 +180,11 @@ class _AdminResumenScreenState extends State<AdminResumenScreen> {
                   )),
                   const SizedBox(width: 12),
                   Expanded(child: _TarjetaStat(
-                    titulo: 'Por aprobar',
-                    valor: '$pendientes',
-                    icono: Icons.hourglass_top,
-                    color: pendientes > 0 ? Colors.orange : Colors.grey,
-                    subtitulo: 'depósitos pendientes',
+                    titulo: 'Deudas clientes',
+                    valor: fmt.format(totalDeuda),
+                    icono: Icons.pending_actions_outlined,
+                    color: totalDeuda > 0 ? Colors.red : Colors.grey,
+                    subtitulo: '${_clientesConDeuda.length} cliente${_clientesConDeuda.length != 1 ? 's' : ''} con deuda',
                   )),
                 ]),
                 const SizedBox(height: 24),

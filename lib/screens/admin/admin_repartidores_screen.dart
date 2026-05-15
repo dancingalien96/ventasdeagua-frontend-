@@ -285,6 +285,7 @@ class _AdminRepartidoresScreenState extends State<AdminRepartidoresScreen> {
     return Scaffold(
       body: body,
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _mostrarFormNuevo,
         child: const Icon(Icons.person_add_outlined),
       ),
