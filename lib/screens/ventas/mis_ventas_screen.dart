@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/venta.dart';
 import '../../models/cierre_dia.dart';
 import '../../services/api_service.dart';
+import '../../services/socket_service.dart';
 import 'nueva_venta_screen.dart';
 import 'cierre_dia_screen.dart';
 
@@ -18,11 +20,23 @@ class _MisVentasScreenState extends State<MisVentasScreen> {
   List<Venta> _ventas = [];
   List<CierreDia> _cierres = [];
   bool _cargando = true;
+  late final StreamSubscription<String> _socketSub;
 
   @override
   void initState() {
     super.initState();
     _cargar();
+    _socketSub = SocketService.eventos.listen((tipo) {
+      if ((tipo == 'ventas' || tipo == 'cierres') && mounted) {
+        _cargar();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _socketSub.cancel();
+    super.dispose();
   }
 
   Future<void> _cargar() async {
@@ -277,16 +291,23 @@ class _TarjetaJornada extends StatelessWidget {
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('Total vendido', style: TextStyle(color: Colors.white60, fontSize: 11)),
                   Text(fmt.format(totalHoy),
-                      style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                      style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis),
                 ])),
                 if (deudaHoy > 0)
-                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                    Text('Deudas: -${fmt.format(deudaHoy)}',
-                        style: TextStyle(color: Colors.red.shade200, fontSize: 12, fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 2),
-                    Text('A depositar: ${fmt.format(depositarHoy)}',
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                  ]),
+                  Flexible(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Text('Deudas: -${fmt.format(deudaHoy)}',
+                          style: TextStyle(color: Colors.red.shade200, fontSize: 12, fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end),
+                      const SizedBox(height: 2),
+                      Text('A depositar: ${fmt.format(depositarHoy)}',
+                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end),
+                    ]),
+                  ),
               ]),
               const SizedBox(height: 4),
               Text('${ventasHoy.length} venta(s) registrada(s)',
@@ -344,7 +365,10 @@ class _TarjetaJornada extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onCerrarDia,
                 icon: const Icon(Icons.lock_clock, size: 18),
-                label: Text('Cerrar día — depositar ${fmt.format(depositarHoy)}'),
+                label: Text(
+                  'Cerrar día — depositar ${fmt.format(depositarHoy)}',
+                  overflow: TextOverflow.ellipsis,
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade700,
                   foregroundColor: Colors.white,

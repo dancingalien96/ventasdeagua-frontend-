@@ -29,19 +29,20 @@ class _LoginScreenState extends State<LoginScreen> {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: Center(
+          child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.water_drop, size: 72, color: Colors.blue),
+                const Icon(Icons.water_drop, size: 60, color: Colors.blue),
                 const SizedBox(height: 8),
                 const Text('Control de Ventas de Agua',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 40),
                 TextFormField(
                   controller: _emailCtrl,
@@ -73,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),

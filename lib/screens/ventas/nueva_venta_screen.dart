@@ -478,17 +478,19 @@ class _NuevaVentaScreenState extends State<NuevaVentaScreen> {
                     boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('Total: ${fmt.format(_total)}',
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        if (_quedoDebiendo && _deuda > 0)
-                          Text('Paga ahora: ${fmt.format(_total - _deuda)}',
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.orange.shade700)),
-                      ]),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('Total: ${fmt.format(_total)}',
+                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis),
+                          if (_quedoDebiendo && _deuda > 0)
+                            Text('Paga ahora: ${fmt.format(_total - _deuda)}',
+                                style: TextStyle(fontSize: 12, color: Colors.orange.shade700),
+                                overflow: TextOverflow.ellipsis),
+                        ]),
+                      ),
+                      const SizedBox(width: 12),
                       ElevatedButton.icon(
                         onPressed: _agregarItem,
                         icon: const Icon(Icons.add),

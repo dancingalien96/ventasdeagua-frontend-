@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/cierre_dia.dart';
 import '../../services/api_service.dart';
+import '../../services/socket_service.dart';
 
 class AdminHistorialCierresScreen extends StatefulWidget {
   const AdminHistorialCierresScreen({super.key});
@@ -14,11 +16,21 @@ class AdminHistorialCierresScreen extends StatefulWidget {
 class _AdminHistorialCierresScreenState extends State<AdminHistorialCierresScreen> {
   List<CierreDia> _cierres = [];
   bool _cargando = true;
+  late final StreamSubscription<String> _socketSub;
 
   @override
   void initState() {
     super.initState();
     _cargar();
+    _socketSub = SocketService.eventos.listen((tipo) {
+      if (tipo == 'cierres' && mounted) _cargar();
+    });
+  }
+
+  @override
+  void dispose() {
+    _socketSub.cancel();
+    super.dispose();
   }
 
   Future<void> _cargar() async {

@@ -202,7 +202,8 @@ class _CierreDiaScreenState extends State<CierreDiaScreen> {
                                   const SizedBox(height: 4),
                                   Text(fmt.format(_totalDepositar),
                                       style: const TextStyle(
-                                          color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold)),
+                                          color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis),
                                 ]),
                               ),
                               Container(
@@ -320,7 +321,9 @@ class _CierreDiaScreenState extends State<CierreDiaScreen> {
                                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                                 : Text(
                                     'Depositar ${fmt.format(_totalDepositar)} y cerrar día',
-                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis),
                           ),
                         ),
                         const SizedBox(height: 16),

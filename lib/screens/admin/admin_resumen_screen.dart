@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +6,7 @@ import '../../models/cierre_dia.dart';
 import '../../models/cliente.dart';
 import '../../models/venta.dart';
 import '../../services/api_service.dart';
+import '../../services/socket_service.dart';
 import 'admin_historial_cierres_screen.dart';
 
 class AdminResumenScreen extends StatefulWidget {
@@ -19,11 +21,23 @@ class _AdminResumenScreenState extends State<AdminResumenScreen> {
   List<CierreDia> _cierresHoy = [];
   List<Cliente> _clientesConDeuda = [];
   bool _cargando = true;
+  late final StreamSubscription<String> _socketSub;
 
   @override
   void initState() {
     super.initState();
     _cargar();
+    _socketSub = SocketService.eventos.listen((tipo) {
+      if ((tipo == 'ventas' || tipo == 'cierres' || tipo == 'clientes') && mounted) {
+        _cargar();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _socketSub.cancel();
+    super.dispose();
   }
 
   Future<void> _cargar() async {
@@ -329,31 +343,36 @@ class _TarjetaCierreHoy extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 12),
-          Row(children: [
-            OutlinedButton.icon(
-              onPressed: onVerComprobante,
-              icon: const Icon(Icons.image_outlined, size: 16),
-              label: const Text('Ver comprobante'),
-              style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-            ),
-            if (cierre.pendiente) ...[
-              const Spacer(),
-              TextButton(
-                onPressed: onRechazar,
-                child: const Text('Rechazar', style: TextStyle(color: Colors.red)),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.spaceBetween,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onVerComprobante,
+                icon: const Icon(Icons.image_outlined, size: 16),
+                label: const Text('Ver comprobante'),
+                style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
               ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: onAprobar,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
-                child: const Text('Aprobar'),
-              ),
+              if (cierre.pendiente)
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  TextButton(
+                    onPressed: onRechazar,
+                    child: const Text('Rechazar', style: TextStyle(color: Colors.red)),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: onAprobar,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+                    child: const Text('Aprobar'),
+                  ),
+                ]),
             ],
-          ]),
+          ),
         ]),
       ),
     );
@@ -370,7 +389,9 @@ class _FilaMonto extends StatelessWidget {
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
         const SizedBox(height: 2),
-        Text(valor, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: color ?? Colors.black87)),
+        Text(valor,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: color ?? Colors.black87),
+            overflow: TextOverflow.ellipsis),
       ]);
 }
 
@@ -401,9 +422,14 @@ class _TarjetaStat extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(icono, color: color, size: 22),
         const SizedBox(height: 8),
-        Text(valor, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+        Text(valor,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+            overflow: TextOverflow.ellipsis),
         const SizedBox(height: 2),
-        Text(subtitulo ?? titulo, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+        Text(subtitulo ?? titulo,
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis),
       ]),
     );
   }

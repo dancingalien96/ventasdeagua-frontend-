@@ -38,6 +38,15 @@ class MyApp extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         ),
       ),
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: mq.textScaler.clamp(maxScaleFactor: 1.15),
+          ),
+          child: child!,
+        );
+      },
       home: Consumer<AuthProvider>(
         builder: (context, auth, child) =>
             auth.autenticado ? const HomeScreen() : const LoginScreen(),
