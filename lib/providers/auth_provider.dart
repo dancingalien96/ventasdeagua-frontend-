@@ -38,7 +38,8 @@ class AuthProvider extends ChangeNotifier {
         await prefs.setString('rol', res['usuario']['rol']);
         await prefs.setString('id', res['usuario']['id'].toString());
         _usuario = Usuario.fromJson(res['usuario']);
-        await NotificacionService.guardarToken();
+        // FCM no es crítico — un fallo aquí no debe bloquear el login
+        NotificacionService.guardarToken().catchError((_) {});
         SocketService.conectar();
         return null;
       }
