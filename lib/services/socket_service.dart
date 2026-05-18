@@ -19,7 +19,6 @@ class SocketService {
           .disableAutoConnect()
           .enableReconnection()
           .setReconnectionDelay(2000)
-          .setReconnectionAttempts(double.infinity.toInt())
           .build(),
     );
 
